@@ -70,6 +70,32 @@ def shutdown_server(token):
     except requests.exceptions.RequestException as e:
         click.echo(f"An error occurred: {e}")
 
+def save_game(token, name):
+    """save game with the provided name"""
+    try:
+        headers = {
+            'Authorization': f'Bearer {token}',
+            'Content-Type': 'application/json'
+        }
+
+        jsonreq = {
+                "function": "SaveGame",
+                "data": {
+                    "SaveName": name
+                }
+        }
+
+        response = requests.post(SERVER_URL, headers=headers, verify=False, json=jsonreq)
+        
+        if response.status_code >= 200 and response.status_code < 300:
+            # savegame returns nothing in the body
+            click.echo(f"Server Status: {response.status_code}, Saved")
+        else:
+            click.echo(f"Failed to get server status: {response.status_code} {response.reason}")
+            click.echo(response.text)
+    except requests.exceptions.RequestException as e:
+        click.echo(f"An error occurred: {e}")
+
 def get_server_status(token):
     """Fetch and display the server status."""
     try:
@@ -97,8 +123,9 @@ def get_server_status(token):
 @click.command()
 @click.option('--password', prompt=True, hide_input=True, help='Password for server authentication.')
 @click.option('--status', is_flag=True, help='Display the server status.')
-@click.option('--shutdown', is_flag=True, help='Display the server status.')
-def cli(password, status, shutdown):
+@click.option('--save', 'save', help='save game with name')
+@click.option('--shutdown', is_flag=True, help='shutdown the server')
+def cli(password, status,save, shutdown):
     """CLI tool to authenticate and interact with the Satisfactory Dedicated Server API."""
     token = authenticate(password)
     
@@ -111,6 +138,9 @@ def cli(password, status, shutdown):
 
     if shutdown:
         shutdown_server(token)
+    
+    if save:
+        save_game(token, save)
 
 if __name__ == '__main__':
     cli()
