@@ -7,6 +7,7 @@ import warnings
 import logging
 import configparser
 import os
+import platform  # Import the platform module to check OS type
 
 from requests.packages import urllib3
 
@@ -23,6 +24,11 @@ CONFIGFILE = os.path.join(os.environ['APPDATA'], 'satisfactory-cli.ini')
 
 # Global variable for the server URL
 SERVER_URL = 'https://localhost:7777/api/v1'  # Default local server
+
+
+def clear_screen():
+    """Clear the terminal screen."""
+    os.system('cls' if platform.system() == 'Windows' else 'clear')
 
 
 def authenticate(password):
@@ -205,8 +211,11 @@ def cli(host, password):
 
     # Menu after authentication
     while True:
+
         display_menu()
         choice = click.prompt("Enter command number", type=int)
+
+        clear_screen()  # Clear screen before executing the selected command
 
         if choice == 1:
             get_server_status(token)
