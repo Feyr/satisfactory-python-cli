@@ -50,11 +50,33 @@ def save_game(token, name):
 
 
 def get_server_status(token):
-    """Fetch and display the server status."""
+    """Fetch and display the server status in a formatted way."""
     response = send_command(token, "QueryServerState")
     if response:
-        click.echo(json.dumps(response.json(), indent=4))
-    return
+        server_state = response.json().get("data", {}).get("serverGameState", {})
+
+        if not server_state:
+            click.echo("Не удалось получить состояние сервера.")
+            return
+
+        click.echo("\nСтатус сервера:\n")
+        click.echo(f"  Активная сессия: {server_state.get('activeSessionName', 'Нет активной сессии')}")
+        click.echo(f"  Подключенные игроки: {server_state.get('numConnectedPlayers', 0)} из {server_state.get('playerLimit', 'неизвестно')}")
+        click.echo(f"  Текущий технологический уровень: {server_state.get('techTier', 'неизвестно')}")
+        click.echo(f"  Активная схема: {server_state.get('activeSchematic', 'неизвестно')}")
+        click.echo(f"  Текущая игровая фаза: {server_state.get('gamePhase', 'неизвестно')}")
+        click.echo(f"  Игра запущена: {'Да' if server_state.get('isGameRunning') else 'Нет'}")
+        click.echo(f"  Игра приостановлена: {'Да' if server_state.get('isGamePaused') else 'Нет'}")
+        click.echo(f"  Средняя скорость обновления: {server_state.get('averageTickRate', 'неизвестно')} FPS")
+        total_duration = server_state.get('totalGameDuration', 0)
+
+        # Преобразование общего времени игры в часы, минуты и секунды
+        hours, remainder = divmod(total_duration, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        click.echo(f"  Общее время игры: {hours}ч {minutes}м {seconds}с")
+
+        click.echo("\nЗапрос статуса завершён.")
+
 
 
 def enumerate_sessions(token):
