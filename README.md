@@ -5,9 +5,9 @@
 
 
 Сообщения от сервера в виде статуса и информация о сессии преведены в порядок.
-В настоящий момент реализовано только 3 вызова и предназначен для работы на той же машине, что и сервер.
+<p>В настоящий момент реализовано только 3 вызова и предназначен для работы на той же машине, что и сервер.
 
 Messages from the server, such as status and session information, have been organized.
-it only implements 3 calls for now, and is meant to run on the same machine as the server
+<p>it only implements 3 calls for now, and is meant to run on the same machine as the server
 
 pull welcomes
