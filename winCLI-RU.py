@@ -74,7 +74,7 @@ def save_game(token, name):
 
 
 def get_server_status(token):
-    """Получить и отобразить статус сервера в формате."""
+    """Получить и отобразить статус сервера в удобном формате."""
     response = send_command(token, "QueryServerState")
     if response:
         server_state = response.json().get("data", {}).get("serverGameState", {})
@@ -85,12 +85,15 @@ def get_server_status(token):
 
         click.echo("\nСтатус сервера:\n")
         click.echo(f"  Активная сессия: {server_state.get('activeSessionName', 'Нет активной сессии')}")
+        click.echo(f"  Сессия для автозагрузки: {server_state.get('autoLoadSessionName', 'Не установлена')}")
         click.echo(f"  Подключенные игроки: {server_state.get('numConnectedPlayers', 0)} из {server_state.get('playerLimit', 'неизвестно')}")
         click.echo(f"  Текущий техуровень: {server_state.get('techTier', 'неизвестно')}")
         click.echo(f"  Активная схема: {server_state.get('activeSchematic', 'неизвестно')}")
+        click.echo(f"  Фаза игры: {server_state.get('gamePhase', 'Нет фазы')}")
         click.echo(f"  Игра запущена: {'Да' if server_state.get('isGameRunning') else 'Нет'}")
         click.echo(f"  Игра на паузе: {'Да' if server_state.get('isGamePaused') else 'Нет'}")
         click.echo(f"  Средняя частота кадров: {server_state.get('averageTickRate', 'неизвестно')} FPS")
+        
         total_duration = server_state.get('totalGameDuration', 0)
 
         # Преобразование общего игрового времени в часы, минуты и секунды
@@ -99,6 +102,7 @@ def get_server_status(token):
         click.echo(f"  Общее время игры: {hours}ч {minutes}м {seconds}с")
 
         click.echo("\nЗапрос статуса завершен.")
+
 
 
 def enumerate_sessions(token):
@@ -123,25 +127,36 @@ def enumerate_sessions(token):
             else:
                 for save_idx, save in enumerate(save_headers):
                     save_name = save.get("saveName", "Неизвестное сохранение")
+                    save_version = save.get("saveVersion", "Неизвестная версия")
+                    build_version = save.get("buildVersion", "Неизвестная версия")
+                    map_name = save.get("mapName", "Неизвестная карта")
+                    map_options = save.get("mapOptions", "Нет дополнительных опций")
                     play_duration = save.get("playDurationSeconds", 0)
                     save_time = save.get("saveDateTime", "Неизвестная дата")
                     is_modded = "Да" if save.get("isModdedSave", False) else "Нет"
-                    build_version = save.get("buildVersion", "Неизвестная версия")
-                    
+                    is_edited = "Да" if save.get("isEditedSave", False) else "Нет"
+                    is_creative_mode = "Да" if save.get("isCreativeModeEnabled", False) else "Нет"
+
                     # Преобразование игрового времени в часы, минуты и секунды
                     hours, remainder = divmod(play_duration, 3600)
                     minutes, seconds = divmod(remainder, 60)
 
                     click.echo(f"  Сохранение {save_idx + 1}: {save_name}")
-                    click.echo(f"    Дата сохранения: {save_time}")
+                    click.echo(f"    Версия сохранения: {save_version}")
+                    click.echo(f"    Версия сборки: {build_version}")
+                    click.echo(f"    Карта: {map_name}")
+                    click.echo(f"    Опции карты: {map_options}")
                     click.echo(f"    Время игры: {hours}ч {minutes}м {seconds}с")
-                    click.echo(f"    Версия игры: {build_version}")
+                    click.echo(f"    Дата сохранения: {save_time}")
                     click.echo(f"    Модифицированное сохранение: {is_modded}")
+                    click.echo(f"    Отредактированное сохранение: {is_edited}")
+                    click.echo(f"    Креативный режим включен: {is_creative_mode}")
             
             if idx == current_session_index:
                 click.echo(f"  * Это текущая активная сессия.")
 
         click.echo("\nПеречисление завершено.")
+
 
 
 def read_config():
