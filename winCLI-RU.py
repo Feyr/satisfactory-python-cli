@@ -7,6 +7,7 @@ import warnings
 import logging
 import configparser
 import os
+import platform  # Import the platform module to check OS type
 
 from requests.packages import urllib3
 
@@ -24,6 +25,9 @@ CONFIGFILE = os.path.join(os.environ['APPDATA'], 'satisfactory-cli.ini')
 # Глобальная переменная для URL сервера
 SERVER_URL = 'https://localhost:7777/api/v1'  # По умолчанию локальный сервер
 
+def clear_screen():
+    """Clear the terminal screen."""
+    os.system('cls' if platform.system() == 'Windows' else 'clear')
 
 def authenticate(password):
     """Authenticate with the server and retrieve a Bearer token."""
@@ -209,6 +213,7 @@ def cli(host, password):
     while True:
         display_menu()
         choice = click.prompt("Введите номер команды", type=int)
+        clear_screen()
 
         if choice == 1:
             get_server_status(token)
