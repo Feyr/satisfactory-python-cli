@@ -74,7 +74,7 @@ def save_game(token, name):
 
 
 def get_server_status(token):
-    """Fetch and display the server status in a formatted way."""
+    """Retrieve and display the server status in a formatted way."""
     response = send_command(token, "QueryServerState")
     if response:
         server_state = response.json().get("data", {}).get("serverGameState", {})
@@ -85,13 +85,15 @@ def get_server_status(token):
 
         click.echo("\nServer Status:\n")
         click.echo(f"  Active Session: {server_state.get('activeSessionName', 'No active session')}")
+        click.echo(f"  Auto-load Session: {server_state.get('autoLoadSessionName', 'Not set')}")
         click.echo(f"  Connected Players: {server_state.get('numConnectedPlayers', 0)} out of {server_state.get('playerLimit', 'unknown')}")
         click.echo(f"  Current Tech Tier: {server_state.get('techTier', 'unknown')}")
         click.echo(f"  Active Schematic: {server_state.get('activeSchematic', 'unknown')}")
-        click.echo(f"  Current Game Phase: {server_state.get('gamePhase', 'unknown')}")
+        click.echo(f"  Game Phase: {server_state.get('gamePhase', 'None')}")
         click.echo(f"  Game Running: {'Yes' if server_state.get('isGameRunning') else 'No'}")
         click.echo(f"  Game Paused: {'Yes' if server_state.get('isGamePaused') else 'No'}")
         click.echo(f"  Average Tick Rate: {server_state.get('averageTickRate', 'unknown')} FPS")
+
         total_duration = server_state.get('totalGameDuration', 0)
 
         # Convert total game time into hours, minutes, and seconds
@@ -100,6 +102,7 @@ def get_server_status(token):
         click.echo(f"  Total Game Time: {hours}h {minutes}m {seconds}s")
 
         click.echo("\nStatus request completed.")
+
 
 
 def enumerate_sessions(token):
@@ -124,25 +127,36 @@ def enumerate_sessions(token):
             else:
                 for save_idx, save in enumerate(save_headers):
                     save_name = save.get("saveName", "Unknown save")
+                    save_version = save.get("saveVersion", "Unknown version")
+                    build_version = save.get("buildVersion", "Unknown version")
+                    map_name = save.get("mapName", "Unknown map")
+                    map_options = save.get("mapOptions", "No additional options")
                     play_duration = save.get("playDurationSeconds", 0)
                     save_time = save.get("saveDateTime", "Unknown date")
                     is_modded = "Yes" if save.get("isModdedSave", False) else "No"
-                    build_version = save.get("buildVersion", "Unknown version")
-                    
+                    is_edited = "Yes" if save.get("isEditedSave", False) else "No"
+                    is_creative_mode = "Yes" if save.get("isCreativeModeEnabled", False) else "No"
+
                     # Convert play time into hours, minutes, and seconds
                     hours, remainder = divmod(play_duration, 3600)
                     minutes, seconds = divmod(remainder, 60)
 
                     click.echo(f"  Save {save_idx + 1}: {save_name}")
-                    click.echo(f"    Save Date: {save_time}")
+                    click.echo(f"    Save Version: {save_version}")
+                    click.echo(f"    Build Version: {build_version}")
+                    click.echo(f"    Map: {map_name}")
+                    click.echo(f"    Map Options: {map_options}")
                     click.echo(f"    Play Time: {hours}h {minutes}m {seconds}s")
-                    click.echo(f"    Game Version: {build_version}")
+                    click.echo(f"    Save Date: {save_time}")
                     click.echo(f"    Modded Save: {is_modded}")
+                    click.echo(f"    Edited Save: {is_edited}")
+                    click.echo(f"    Creative Mode Enabled: {is_creative_mode}")
             
             if idx == current_session_index:
                 click.echo(f"  * This is the current active session.")
 
         click.echo("\nEnumeration completed.")
+
 
 
 def read_config():
