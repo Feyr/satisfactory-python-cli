@@ -39,6 +39,24 @@ def authenticate(password):
         return token_data.get("data").get('authenticationToken')
     return None
 
+def get_server_options(token):
+    """Fetch and display server options."""
+    response = send_command(token, "GetServerOptions")
+    if response:
+        options_data = response.json().get("data", {}).get("serverOptions", {})  # Update this line
+        
+        if not options_data:
+            click.echo("No options found in the server response.")
+            return
+
+        click.echo("\nServer Options:\n")
+        for key, value in options_data.items():
+            click.echo(f"  {key}: {value}")
+
+        click.echo("\nOptions request completed.")
+    else:
+        click.echo("No response received from the server.")
+
 
 def shutdown_server(token):
     response = send_command(token, "Shutdown")
@@ -181,7 +199,8 @@ def display_menu():
     click.echo("2. Save game")
     click.echo("3. Shutdown server")
     click.echo("4. Enumerate sessions")
-    click.echo("5. Exit\n")
+    click.echo("5. Show server options")  # New option
+    click.echo("6. Exit\n")  # Updated option number
 
 
 @click.command()
@@ -229,6 +248,8 @@ def cli(host, password):
         elif choice == 4:
             enumerate_sessions(token)
         elif choice == 5:
+            get_server_options(token)  # Call the new function
+        elif choice == 6:
             click.echo("Exiting the program.")
             break
         else:
