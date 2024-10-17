@@ -56,19 +56,12 @@ This guide will help you install and run your Python application on Windows.
    - Open the `winCLI-EN.py` or `winCLI-RU.py` file in a text editor.
    - Find the line:
      ```python
-     SERVER_URL = 'https://localhost:7777/api/v1'
+      @click.option('--host', 'host', default="localhost:7777", help='Host:port to connect to') 
      ```
-   - Replace `localhost` with the IP address of your server if it is on a different machine. For example:
-     ```python
-     SERVER_URL = 'https://192.168.1.10:7777/api/v1'
-     ```
-
-2. **Set Host Parameter**:
-   - Find the line:
-     ```python
-     @click.option('--host', 'host', default="localhost:7777", help='Host:port for connection')
-     ```
-   - Change `localhost` to the same address if you want it to be the default.
+   - Replace localhost with the IP address of your server if it is on another machine. For example:
+   ```python
+      @click.option('--host', 'host', default="192.168.1.10:7777", help='Host:port to connect to')
+   ```
 
 ## Step 4: Run the Application
 
