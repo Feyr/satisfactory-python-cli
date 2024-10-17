@@ -1,18 +1,16 @@
-[Смотреть README на русском](https://github.com/asidsx/satisfactory-python-cli/blob/main/README.ru.md)
-
-
-![image](https://github.com/user-attachments/assets/610e4706-63f3-44cf-b418-f4d758f2debf)
-
+[Смотреть README на русском](README.ru.md)
 
 
 
 
 Messages from the server, such as status and session information, have been organized.
-<p>Currently, only 3 calls are implemented, and it is designed to work on the same machine as the server, or you can modify the source code.
+<p>Currently, only 4 calls are implemented, and it is designed to work on the same machine as the server, or you can modify the source code.
 
 pull welcomes
 
-
+* cli.py is the pure cli that can be used for scripting
+* winCLI-* are text-based interactive UI that look like this:  
+![image](https://github.com/user-attachments/assets/610e4706-63f3-44cf-b418-f4d758f2debf)
 
 ---
 
