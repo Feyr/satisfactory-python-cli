@@ -198,7 +198,7 @@ def display_menu():
 
 
 @click.command()
-@click.option('--host', 'host', default="77.245.101.18:7777", help='Хост:порт для подключения')
+@click.option('--host', 'host', default="localhost:7777", help='Хост:порт для подключения')
 @click.option('--password', hide_input=True, help='Пароль для аутентификации на сервере.')
 @click.option('--command', type=click.Choice(['status', 'save', 'shutdown', 'sessions', 'options'], case_sensitive=False), help='Выполнить указанную команду.')
 @click.option('--save_name', default=None, help='Имя сохранения для команды "save".')
