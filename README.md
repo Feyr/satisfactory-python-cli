@@ -1,11 +1,11 @@
+[Смотреть README на русском](https://github.com/asidsx/satisfactory-python-cli/blob/main/README.ru.md)
+
+
 ![image](https://github.com/user-attachments/assets/610e4706-63f3-44cf-b418-f4d758f2debf)
 
-![image](https://github.com/user-attachments/assets/07ed177e-bd6b-4b7c-a80b-2fc5e0979721)
 
 
 
-Сообщения от сервера в виде статуса и информация о сессии преведены в порядок.
-<p>В настоящий момент реализовано только 3 вызова и предназначен для работы на той же машине, что и сервер или вы можете изменить исходники.
 
 Messages from the server, such as status and session information, have been organized.
 <p>Currently, only 3 calls are implemented, and it is designed to work on the same machine as the server, or you can modify the source code.
@@ -13,101 +13,6 @@ Messages from the server, such as status and session information, have been orga
 pull welcomes
 
 
--------
-# Руководство по запуску приложения Python на Windows
-
-Это руководство поможет вам установить и запустить ваше Python-приложение на Windows.
-
-## Шаг 1: Установка Python
-
-1. **Скачивание Python**:
-   - Перейдите на [официальный сайт Python](https://www.python.org/downloads/).
-   - Скачайте последнюю версию Python для Windows (выберите версию для вашей архитектуры: 32-бит или 64-бит).
-
-2. **Установка Python**:
-   - Запустите установщик Python.
-   - **Обязательно отметьте** опцию **"Add Python to PATH"**.
-   - Нажмите на **"Install Now"** и следуйте инструкциям на экране.
-
-3. **Проверка установки**:
-   - Откройте командную строку (нажмите `Win + R`, введите `cmd` и нажмите Enter).
-   - Введите команду:
-     ```bash
-     python --version
-     ```
-   - Если установка прошла успешно, вы увидите версию Python.
-
-## Шаг 2: Установка зависимостей
-
-1. **Открытие командной строки**:
-   - Если вы уже не в командной строке, откройте её.
-
-2. **Установка зависимостей**:
-   - Выполните следующую команду для установки необходимых библиотек:
-     ```bash
-     pip install click requests configparser
-     ```
-
-## Шаг 3: Настройка вашего приложения
-
-1. **Настройка URL сервера**:
-   - Откройте файл `winCLI-EN.py` или `winCLI-RU.py` в текстовом редакторе.
-   - Найдите строку:
-     ```python
-     SERVER_URL = 'https://localhost:7777/api/v1'
-     ```
-   - Замените `localhost` на IP-адрес вашего сервера, если он находится на другой машине. Например:
-     ```python
-     SERVER_URL = 'https://192.168.1.10:7777/api/v1'
-     ```
-
-2. **Настройка параметра хоста**:
-   - Найдите строку:
-     ```python
-     @click.option('--host', 'host', default="localhost:7777", help='Хост:порт для подключения')
-     ```
-   - Измените `localhost` на тот же адрес, если хотите, чтобы он был по умолчанию.
-
-## Шаг 4: Запуск приложения
-
-1. **Запуск программы**:
-   - В командной строке перейдите в директорию, где находится ваш файл `winCLI-EN.py` или `winCLI-RU.py`:
-     ```bash
-     cd путь\к\вашему\проекту
-     ```
-   - Запустите программу с помощью команды:
-     ```bash
-     python winCLI-RU.py  # Или winCLI-EN.py
-     ```
-
-## Шаг 5: Компиляция программы с помощью PyInstaller
-
-1. **Установка PyInstaller**:
-   - В командной строке выполните следующую команду:
-     ```bash
-     pip install pyinstaller
-     ```
-
-2. **Компиляция программы**:
-   - Перейдите в директорию с вашим скриптом:
-     ```bash
-     cd путь\к\вашему\проекту
-     ```
-   - Выполните команду для компиляции:
-     ```bash
-     pyinstaller --onefile winCLI-RU.py  # Или winCLI-EN.py
-     ```
-   - Этот процесс создаст несколько папок, включая `dist`, в которой будет находиться ваш исполняемый файл.
-
-3. **Запуск скомпилированного файла**:
-   - Перейдите в папку `dist`:
-     ```bash
-     cd dist
-     ```
-   - Запустите скомпилированный файл:
-     ```bash
-     winCLI-RU.exe  # Или winCLI-EN.exe
-     ```
 
 ---
 
@@ -205,3 +110,94 @@ This guide will help you install and run your Python application on Windows.
      ```bash
      winCLI-RU.exe  # Or winCLI-EN.exe
      ```
+---
+CLI
+---
+
+## Running the Program
+
+1. **Navigate to the Program Directory**: Open a terminal or command prompt and navigate to the directory where the Python script is located.
+
+2. **Execute the Script**: Run the script using the following command:
+
+ ```bash
+ python winCLI-EN.py
+ ```
+
+
+## Command-Line Options
+
+When you run the program, you can use the following command-line options:
+
+- **`--host`**: Specify the host and port for connecting to the server. The default is `localhost:7777`.
+- **`--password`**: Provide the password for authentication with the server (it will be hidden when typed).
+- **`--command`**: Specify a command to execute immediately. Possible commands include:
+  - `status`: Get the current server status.
+  - `save`: Save the game.
+  - `shutdown`: Shut down the server.
+  - `sessions`: List available sessions.
+  - `options`: Get server options.
+- **`--save_name`**: Specify the name to use when saving the game (used with the `save` command).
+
+## Example Usage
+
+Here are a few examples of how to use the program:
+
+1. **Connect to the Server and Show Status**:
+
+ ```bash
+ python winCLI-EN.py --host localhost:7777 --password your_password --command status
+ ```
+
+2. **Save the Game**:
+
+ ```bash
+ python winCLI-EN.py --host localhost:7777 --password your_password --command save --save_name "MySave"
+ ```
+
+3. **Shutdown the Server**:
+
+ ```bash
+ python winCLI-EN.py --host localhost:7777 --password your_password --command shutdown
+ ```
+
+4. **List Sessions**:
+
+ ```bash
+ python winCLI-EN.py --host localhost:7777 --password your_password --command sessions
+ ```
+
+5. **Get Server Options**:
+
+ ```bash
+ python winCLI-EN.py --host localhost:7777 --password your_password --command options
+ ```
+
+## Interactive Mode
+
+If you run the script without specifying a command, it will enter an interactive mode where you can select commands from a menu. Here's how to interact in this mode:
+
+1. **Run the Script**:
+
+ ```bash
+ python winCLI-EN.py --host localhost:7777 --password your_password
+ ```
+
+2. **Select a Command**: After the authentication, the program will display a menu:
+
+```
+Select a command:
+1. Show server status
+2. Save game
+3. Shut down server
+4. List sessions
+5. Show server options
+6. Exit
+```
+
+3. **Enter the Command Number**: Type the number of the command you want to execute and press Enter.
+
+4. **Follow Prompts**: If additional information is needed (e.g., save name), the program will prompt you to provide it.
+
+5. **Exit the Program**: Choose the "Exit" option from the menu to close the program.
+
