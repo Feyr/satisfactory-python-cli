@@ -7,7 +7,7 @@ import warnings
 import logging
 import configparser
 import os
-import platform  # Импортируем модуль platform для проверки типа ОС
+import platform
 
 from requests.packages import urllib3
 
@@ -19,15 +19,13 @@ requests_log = logging.getLogger("requests.packages.urllib3")
 requests_log.setLevel(logging.DEBUG)
 requests_log.propagate = True
 
-# Путь к файлу конфигурации для Windows
 CONFIGFILE = os.path.join(os.environ['APPDATA'], 'satisfactory-cli.ini')
 
 # Глобальная переменная для URL сервера
-SERVER_URL = 'https://localhost:7777/api/v1'  # Локальный сервер по умолчанию
+SERVER_URL = None
 
 
 def clear_screen():
-    """Очистить экран терминала."""
     os.system('cls' if platform.system() == 'Windows' else 'clear')
 
 
@@ -39,12 +37,12 @@ def authenticate(password):
         return token_data.get("data").get('authenticationToken')
     return None
 
+
 def get_server_options(token):
     """Получить и отобразить параметры сервера."""
     response = send_command(token, "GetServerOptions")
     if response:
-        options_data = response.json().get("data", {}).get("serverOptions", {})  # Обновите эту строку
-        
+        options_data = response.json().get("data", {}).get("serverOptions", {})
         if not options_data:
             click.echo("Параметры не найдены в ответе сервера.")
             return
@@ -74,11 +72,10 @@ def save_game(token, name):
 
 
 def get_server_status(token):
-    """Получить и отобразить статус сервера в удобном формате."""
+    """Получить и отобразить статус сервера."""
     response = send_command(token, "QueryServerState")
     if response:
         server_state = response.json().get("data", {}).get("serverGameState", {})
-
         if not server_state:
             click.echo("Не удалось получить состояние сервера.")
             return
@@ -95,18 +92,14 @@ def get_server_status(token):
         click.echo(f"  Средняя частота кадров: {server_state.get('averageTickRate', 'неизвестно')} FPS")
         
         total_duration = server_state.get('totalGameDuration', 0)
-
-        # Преобразование общего игрового времени в часы, минуты и секунды
         hours, remainder = divmod(total_duration, 3600)
         minutes, seconds = divmod(remainder, 60)
         click.echo(f"  Общее время игры: {hours}ч {minutes}м {seconds}с")
-
         click.echo("\nЗапрос статуса завершен.")
 
 
-
 def enumerate_sessions(token):
-    """Функция для перечисления сессий и отображения их в удобном формате."""
+    """Перечислить сессии."""
     response = send_command(token, "EnumerateSessions")
     if response:
         sessions_data = response.json().get("data", {}).get("sessions", [])
@@ -130,33 +123,22 @@ def enumerate_sessions(token):
                     save_version = save.get("saveVersion", "Неизвестная версия")
                     build_version = save.get("buildVersion", "Неизвестная версия")
                     map_name = save.get("mapName", "Неизвестная карта")
-                    map_options = save.get("mapOptions", "Нет дополнительных опций")
                     play_duration = save.get("playDurationSeconds", 0)
                     save_time = save.get("saveDateTime", "Неизвестная дата")
                     is_modded = "Да" if save.get("isModdedSave", False) else "Нет"
-                    is_edited = "Да" if save.get("isEditedSave", False) else "Нет"
-                    is_creative_mode = "Да" if save.get("isCreativeModeEnabled", False) else "Нет"
 
-                    # Преобразование игрового времени в часы, минуты и секунды
                     hours, remainder = divmod(play_duration, 3600)
                     minutes, seconds = divmod(remainder, 60)
 
                     click.echo(f"  Сохранение {save_idx + 1}: {save_name}")
                     click.echo(f"    Версия сохранения: {save_version}")
-                    click.echo(f"    Версия сборки: {build_version}")
-                    click.echo(f"    Карта: {map_name}")
-                    click.echo(f"    Опции карты: {map_options}")
                     click.echo(f"    Время игры: {hours}ч {minutes}м {seconds}с")
                     click.echo(f"    Дата сохранения: {save_time}")
-                    click.echo(f"    Модифицированное сохранение: {is_modded}")
-                    click.echo(f"    Отредактированное сохранение: {is_edited}")
-                    click.echo(f"    Креативный режим включен: {is_creative_mode}")
             
             if idx == current_session_index:
                 click.echo(f"  * Это текущая активная сессия.")
 
         click.echo("\nПеречисление завершено.")
-
 
 
 def read_config():
@@ -185,9 +167,7 @@ def send_command(token, funcName, data=None):
                 'Content-Type': 'application/json'
             }
 
-        jsonreq = {
-            "function": funcName
-        }
+        jsonreq = {"function": funcName}
 
         if data:
             jsonreq["data"] = data
@@ -213,21 +193,26 @@ def display_menu():
     click.echo("2. Сохранить игру")
     click.echo("3. Выключить сервер")
     click.echo("4. Перечислить сессии")
-    click.echo("5. Показать параметры сервера")  # Новый пункт
-    click.echo("6. Выйти\n")  # Обновленный номер пункта
+    click.echo("5. Показать параметры сервера")
+    click.echo("6. Выйти\n")
 
 
 @click.command()
-@click.option('--host', 'host', default="localhost:7777", help='Хост:порт для подключения')
+@click.option('--host', 'host', default="77.245.101.18:7777", help='Хост:порт для подключения')
 @click.option('--password', hide_input=True, help='Пароль для аутентификации на сервере.')
-def cli(host, password):
+@click.option('--command', type=click.Choice(['status', 'save', 'shutdown', 'sessions', 'options'], case_sensitive=False), help='Выполнить указанную команду.')
+@click.option('--save_name', default=None, help='Имя сохранения для команды "save".')
+def cli(host, password, command, save_name):
     """CLI-инструмент для аутентификации и взаимодействия с API выделенного сервера Satisfactory."""
+    global SERVER_URL  # Нужно использовать глобальную переменную
+    SERVER_URL = f'https://{host}/api/v1'  # Обновляем глобальную переменную SERVER_URL
+
     config = read_config()
     token = config.get("server", "token")
 
     if not token:
         # Если токена нет, запросить пароль
-        password = click.prompt("Пароль", hide_input=True)
+        password = click.prompt("Пароль", hide_input=True) if not password else password
 
         click.echo("Аутентификация...")
         token = authenticate(password)
@@ -238,36 +223,47 @@ def cli(host, password):
             click.echo("Аутентификация не удалась.")
             return
 
-    if host:
-        global SERVER_URL
-        SERVER_URL = f'https://{host}/api/v1'
-
-    # Меню после аутентификации
-    while True:
-
-        display_menu()
-        choice = click.prompt("Введите номер команды", type=int)
-
-        clear_screen()  # Очистить экран перед выполнением команды
-
-        if choice == 1:
+    if command:
+        # Выполнение команды, переданной через CLI
+        if command == 'status':
             get_server_status(token)
-        elif choice == 2:
-            save_name = click.prompt("Введите имя для сохранения")
+        elif command == 'save':
+            if not save_name:
+                save_name = click.prompt("Введите имя для сохранения")
             save_game(token, save_name)
-        elif choice == 3:
-            confirm_shutdown = click.confirm("Вы уверены, что хотите выключить сервер?", default=False)
-            if confirm_shutdown:
+        elif command == 'shutdown':
+            if click.confirm("Вы уверены, что хотите выключить сервер?", default=False):
                 shutdown_server(token)
-        elif choice == 4:
+        elif command == 'sessions':
             enumerate_sessions(token)
-        elif choice == 5:
-            get_server_options(token)  # Вызов новой функции
-        elif choice == 6:
-            click.echo("Выход из программы.")
-            break
-        else:
-            click.echo("Неверный выбор, попробуйте снова.")
+        elif command == 'options':
+            get_server_options(token)
+    else:
+        # Переход к интерактивному меню
+        while True:
+            display_menu()
+            choice = click.prompt("Введите номер команды", type=int)
+
+            clear_screen()
+
+            if choice == 1:
+                get_server_status(token)
+            elif choice == 2:
+                save_name = click.prompt("Введите имя для сохранения")
+                save_game(token, save_name)
+            elif choice == 3:
+                if click.confirm("Вы уверены, что хотите выключить сервер?", default=False):
+                    shutdown_server(token)
+            elif choice == 4:
+                enumerate_sessions(token)
+            elif choice == 5:
+                get_server_options(token)
+            elif choice == 6:
+                click.echo("Выход из программы.")
+                break
+            else:
+                click.echo("Неверный выбор, попробуйте снова.")
+
 
 
 if __name__ == '__main__':
