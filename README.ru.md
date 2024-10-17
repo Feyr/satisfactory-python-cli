@@ -44,11 +44,11 @@
    - Откройте файл `winCLI-EN.py` или `winCLI-RU.py` в текстовом редакторе.
    - Найдите строку:
      ```python
-@click.option('--host', 'host', default="localhost:7777", help='Host:port to connect to')
+      @click.option('--host', 'host', default="localhost:7777", help='Host:port to connect to')
      ```
    - Замените `localhost` на IP-адрес вашего сервера, если он находится на другой машине. Например:
      ```python
-@click.option('--host', 'host', default="192.168.1.10:7777", help='Host:port to connect to')
+      @click.option('--host', 'host', default="192.168.1.10:7777", help='Host:port to connect to')
      ```
 
 
